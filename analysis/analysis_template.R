@@ -3,9 +3,11 @@
 # run if libraries are not installed
 # install.packages("readxl")
 # install.packages("ggplot2")
+# install.packages("reshape2")
 
 library(readxl)  # to read excel files -- not needed if data are in plain text (e.g., csv)
 library(ggplot2)
+library(reshape2)
 
 # set your working directory to where your data live
 # be sure to use forward slashes or double backslashes
@@ -43,6 +45,18 @@ env <- read_excel("LeaveTree_2018_Masterfile.xlsx", "Site")
 
 # optionally, one can limit the analysis to observations of singing birds
 # sp <- sp[sp$type == "S", ]
+
+
+# aggregate by count and species ----
+
+# not that this will drop information about what type of observations was recorded
+
+# this will result in one row per species/count for each minute/distance that
+# species was detected. To aggretate such that there is only one record for each
+# species per point count, add "minute" and "distance" to "drop".
+drop <- c("type", "comments")
+keep <- setdiff(names(sp), drop)
+sp <- aggregate(howmany ~ ., sp[, keep], FUN = sum)
 
 
 # check dates ----
@@ -89,3 +103,18 @@ ggplot(data = sp_bar, mapping = aes(x = sppcode, y = howmany)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
   scale_y_continuous(expand = c(0, 0), limits = limits) +
   ylab("count frequency")
+
+
+# wide formate ----
+
+# often, our data stored such that a given survey has multiple records associated
+# with it (e.g., one row per species). this is often refered to as long formate.
+# for some analysis, we need one row per survey and one column per species. this
+# is often refered to as wide format. the following converts long format to wide
+# format.
+
+# in the formula, place all columns that identify a single survey (site, ptcount,
+# and date in this case) on the left of the tilde and the column that designates
+# the new column names on the right.
+sp_wide <- dcast(sp, formula = site + ptcount + date ~ sppcode,
+                 fun.aggregate = sum, fill = 0, value.var = "howmany")
