@@ -18,7 +18,7 @@ setwd("C:/git_repositories/data_template/data")
 
 # if your data are in excel format you can read them with read_excel
 # read_excel returns a tibble which is a data frame with a couple extra features
-# read_excel will generally read dates in a dates reather than stings
+# read_excel will generally read dates in as dates reather than stings
 # in this example, we increased guess_max to 2000 (the number rows it checkes
 # before setting the data type) so that read_excel correctly guessed the
 # "comments" column
@@ -30,7 +30,7 @@ env <- read_excel("LeaveTree_2018_Masterfile.xlsx", "Site")
 # if your data are in csv format you can read them with read.csv
 # this is the tried and true method of reading data into R
 # "as.is = TRUE" stops read.csv from formating strings as factors
-# it's often easier to do this and then make factors of an collomns needed
+# it's often easier to do this and then make factors of any collomns needed
 # sp <- read.csv("LeaveTree_2018_Masterfile_bird.csv", as.is = TRUE)
 # env <- read.csv("LeaveTree_2018_Masterfile_site.csv", as.is = TRUE)
 
@@ -103,6 +103,40 @@ ggplot(data = sp_bar, mapping = aes(x = sppcode, y = howmany)) +
   theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)) +
   scale_y_continuous(expand = c(0, 0), limits = limits) +
   ylab("count frequency")
+
+
+# side-by-side bar plot ----
+
+# here, we predend that there are two treatments in the study Y and N.
+env$treatment <- sample(c("Y", "N"), size = nrow(env), replace = TRUE)
+
+# check how many of each there are
+table(env$treatment)
+
+# this is only needed if you want control over the order that treatment is
+# plotted in. it will order treatment alphabetically by default. one could do
+# the same thing with species if desired
+env$treatment <- factor(env$treatment, levels = c("Y", "N"))
+
+sp_side <- aggregate(howmany ~ site + ptcount + date + sppcode, sp, FUN = sum)
+by <- c("site", "ptcount", "date")
+sp_side <- merge(sp, env, by = by)
+
+# just look at the 10 most common species
+top10 <- table(sp_side$sppcode)
+top10 <- names(sort(top10, decreasing = TRUE))[1:10]
+sp_side <- sp_side[sp_side$sppcode %in% top10, ]
+
+ggplot(sp_side, aes(x = sppcode, fill = treatment)) +
+  # dodge places the bars next to each other instead of the default on top of
+  # each other
+  geom_bar(position = "dodge") +
+  # the rest is just making it look nice
+  # not needed in this example, but usefull for long names
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  ylab("n observations") +
+  xlab("Species") +
+  scale_fill_manual(values = c("blue3", "firebrick3"))
 
 
 # wide formate ----
