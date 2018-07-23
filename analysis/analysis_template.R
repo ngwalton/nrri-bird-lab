@@ -55,8 +55,8 @@ env <- read_excel("LeaveTree_2018_Masterfile.xlsx", "Site")
 # species was detected. To aggretate such that there is only one record for each
 # species per point count, add "minute" and "distance" to "drop".
 drop <- c("type", "comments")
-keep <- setdiff(names(sp), drop)
-sp <- aggregate(howmany ~ ., sp[, keep], FUN = sum)
+sp <- sp[, setdiff(names(sp), drop)]
+sp <- aggregate(howmany ~ ., sp, FUN = sum)
 
 
 # check dates ----
@@ -79,7 +79,7 @@ sp_lv <- aggregate(howmany ~ sppcode + site + ptcount + date, sp, FUN = sum)
 sp_lv$rnum <- as.numeric(rownames(sp_lv))
 sp_labs <- sp_lv[sp_lv$howmany > cutoff, ]
 
-# vjust may need some tweeking to plot in a useful manor (moves labels up and down)
+# vjust may need some tweaking to plot in a useful manor (moves labels up and down)
 ggplot(data = sp_lv, mapping = aes(x = rnum, y = howmany)) +
   geom_point() +
   geom_text(aes(x = rnum, y = howmany, label = sppcode), data = sp_labs,
@@ -92,7 +92,7 @@ sp_bar <- aggregate(howmany ~ sppcode, sp, FUN = length)
 sp_bar <- sp_bar[order(sp_bar$howmany, decreasing = TRUE), ]
 sp_bar$sppcode <- factor(sp_bar$sppcode, levels = sp_bar$sppcode)
 
-# expand removes white space between labels and bargs
+# expand removes white space between labels and bars
 # limits maintains white space above bars
 limits <- c(0, max(sp_bar$howmany * 1.03))
 
@@ -107,11 +107,11 @@ ggplot(data = sp_bar, mapping = aes(x = sppcode, y = howmany)) +
 
 # wide formate ----
 
-# often, our data stored such that a given survey has multiple records associated
-# with it (e.g., one row per species). this is often refered to as long formate.
-# for some analysis, we need one row per survey and one column per species. this
-# is often refered to as wide format. the following converts long format to wide
-# format.
+# often, our data are stored such that a given survey has multiple records
+# associated with it (e.g., one row per species). this is often refered to as
+# long formate. for some analyses, we need one row per survey and one column per
+# species. this is often refered to as wide format. the following converts long
+# format to wide format.
 
 # in the formula, place all columns that identify a single survey (site, ptcount,
 # and date in this case) on the left of the tilde and the column that designates
