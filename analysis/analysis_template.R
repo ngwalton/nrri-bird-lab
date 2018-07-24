@@ -1,6 +1,6 @@
 # example template
 
-# show example of adding commong names?
+# show example of adding common names?
 
 # run if libraries are not installed
 # install.packages("readxl")
@@ -24,17 +24,17 @@ setwd("C:/git_repositories/data_template/data")
 # in this example, we increased guess_max to 2000 (the number rows it checks
 # before setting the data type) so that read_excel correctly guessed the
 # "comments" column
-sp <- read_excel(path = "LeaveTree_2018_Masterfile.xlsx", sheet = "Bird",
+sp <- read_excel(path = "example_data_2018_masterfile.xlsx", sheet = "bird",
                  guess_max = 2000)
 
-env <- read_excel("LeaveTree_2018_Masterfile.xlsx", "Site")
+env <- read_excel("example_data_2018_masterfile.xlsx", "site")
 
 # if your data are in csv format you can read them with read.csv
 # this is the tried and true method of reading data into R
 # "as.is = TRUE" stops read.csv from formatting strings as factors
 # it's often easier to do this and then make factors of any columns needed
-# sp <- read.csv("LeaveTree_2018_Masterfile_bird.csv", as.is = TRUE)
-# env <- read.csv("LeaveTree_2018_Masterfile_site.csv", as.is = TRUE)
+# sp <- read.csv("example_data_2018_masterfile_bird.csv", as.is = TRUE)
+# env <- read.csv("example_data_2018_masterfile_site.csv", as.is = TRUE)
 
 # format date as a date
 # dates may also be formatted as "%Y-%m-%d"
@@ -60,7 +60,7 @@ check <- c("site", "ptcount", "date", "time")
 anyNA(env[, check])
 
 # there are NAs -- check which column and how many
-sapply(env[, check], function(x) sum(is.na(x)))  # two time values missing
+sapply(env[, check], function(x) sum(is.na(x)))  # one time value is missing
 
 # this may not be important in this case, but checking unique values is often
 # useful to make sure they are as expected
@@ -135,10 +135,7 @@ ggplot(data = sp_bar, mapping = aes(x = sppcode, y = howmany)) +
   ylab("count frequency")
 
 
-# side-by-side bar plot ----
-
-# here, we pretend that there are two treatments in the study Y and N.
-env$treatment <- sample(c("Y", "N"), size = nrow(env), replace = TRUE)
+# side-by-side bar plot by treament ----
 
 # check how many of each there are
 table(env$treatment)
@@ -148,7 +145,7 @@ table(env$treatment)
 # the same thing with species if desired. levels must contain all levels in
 # treatment, and should be in the order you want them to appear in the figure
 # legend.
-env$treatment <- factor(env$treatment, levels = c("Y", "N"))
+env$treatment <- factor(env$treatment, levels = c("group", "strip", "control"))
 
 sp_side <- aggregate(howmany ~ site + ptcount + date + sppcode, sp, FUN = sum)
 by <- c("site", "ptcount", "date")
@@ -167,8 +164,7 @@ ggplot(sp_side, aes(x = sppcode, fill = treatment)) +
   # not needed in this example, but useful for long names
   theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
   ylab("n observations") +
-  xlab("Species") +
-  scale_fill_manual(values = c("blue3", "firebrick3"))
+  xlab("Species")
 
 
 # wide format ----
