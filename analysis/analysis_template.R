@@ -1,19 +1,31 @@
-# example template
+# this is a template to provide examples of error checking, figeures,
+# etc. that our lab commonly uses when first looking at count data.
 
+# list of examples to add:
 # show example of adding common names?
 
-# run if libraries are not installed
+
+# uncomment and run the following if libraries were not previously installed;
+# only needs to be run once
 # install.packages("readxl")
+# install.packages("here")
 # install.packages("ggplot2")
 # install.packages("reshape2")
 
-library(readxl)  # to read excel files -- not needed if data are in plain text (e.g., csv)
+library(readxl)  # to read excel files; not needed if data are plain text (e.g., csv)
+library(here)    # to auto-find working directory
 library(ggplot2)
 library(reshape2)
 
-# set your working directory to where your data live
-# be sure to use forward slashes or double backslashes
-setwd("C:/git_repositories/data_template/data")
+# set your working directory to where your project lives. using here() from the
+# here package makes this easy and repetable accross computerers. here() will
+# look for an RStudio file (among other things) to guess your project root.
+setwd(here())
+
+# one can also hard-code the location like so (be sure to use forward slashes or
+# double backslashes)
+# setwd("/data_template")  # if project is in the root (usually C on Windows)
+# setwd("~/data_template") # if project is in your home directory (My Docs on Widows)
 
 
 # read data ----
@@ -24,10 +36,11 @@ setwd("C:/git_repositories/data_template/data")
 # in this example, we increased guess_max to 2000 (the number rows it checks
 # before setting the data type) so that read_excel correctly guessed the
 # "comments" column
-sp <- read_excel(path = "example_data_2018_masterfile.xlsx", sheet = "bird",
+data_file <- "./data/example_data_2018_masterfile.xlsx"
+sp <- read_excel(path = data_file, sheet = "bird",
                  guess_max = 2000)
 
-env <- read_excel("example_data_2018_masterfile.xlsx", "site")
+env <- read_excel(data_file, "site")
 
 # if your data are in csv format you can read them with read.csv
 # this is the tried and true method of reading data into R
@@ -36,8 +49,7 @@ env <- read_excel("example_data_2018_masterfile.xlsx", "site")
 # sp <- read.csv("example_data_2018_masterfile_bird.csv", as.is = TRUE)
 # env <- read.csv("example_data_2018_masterfile_site.csv", as.is = TRUE)
 
-# format date as a date
-# dates may also be formatted as "%Y-%m-%d"
+# format date as a date; another common date format is "%Y-%m-%d"
 # date_form <- "%m/%d/%Y"
 # sp$date <- as.Date(sp$date , date_form)
 # env$date <- as.Date(env$date , date_form)
