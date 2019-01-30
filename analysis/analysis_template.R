@@ -13,14 +13,14 @@
 # install.packages("reshape2")
 
 library(readxl)  # to read excel files; not needed if data are plain text (e.g., csv)
-library(here)    # to auto-find working directory
+library(here)    # to auto-find working directory based on RStudio project
 library(ggplot2)
 library(reshape2)
 
 # set your working directory to where your project lives. using here() from the
 # here package makes this easy and repeatable across computers. here() will
 # look for an RStudio file (among other things) to guess your project root.
-setwd(here())
+setwd(here::here())
 
 # one can also hard-code the location like so (be sure to use forward slashes or
 # double backslashes)
@@ -189,7 +189,6 @@ ggplot(sp_side, aes(x = sppcode, fill = treatment)) +
   # the following angles the bar labels; not essential in this example, but
   # useful for long names
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
 
 
 # wide format ----
